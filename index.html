@@ -24,7 +24,7 @@
         .navbar-brand { font-weight: 700; color: var(--primary) !important; }
         .hero { background: linear-gradient(135deg, #eef2ff, #d0e0ff); padding: 4rem 2rem; border-radius: 1.5rem; margin: 2rem 0; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,.08); }
         .hero h1 { font-weight: 800; color: var(--primary); margin-bottom: 1rem; }
-        .hero p { font-size: 1.1rem; color: #555; max-width: 700px; margin: 0 auto 2rem; }
+        .hero p { font-size: 1.1rem; color: #555; max-width: 700px; margin: 0 auto 2rem; font-weight: 500; }
         .section-tabs { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin: 3rem 0; }
         .tab-card { background: white; border: 1px solid var(--border); border-radius: 1rem; padding: 2rem; width: 280px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,.05); transition: all 0.3s ease; cursor: pointer; }
         .tab-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,.12); border-color: var(--primary); }
@@ -44,10 +44,12 @@
         .search-result-oee { font-weight: 700; color: var(--success); font-size: 1.1rem; }
         .no-results { padding: 1.5rem; text-align: center; color: #6c757d; font-style: italic; }
         .action-buttons { display: flex; justify-content: center; gap: 1rem; margin: 2rem auto; flex-wrap: wrap; }
-        .show-oee-btn, .export-excel-btn { background: var(--primary); color: white; border: none; border-radius: 1rem; padding: 1rem 2rem; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: .75rem; box-shadow: 0 6px 20px rgba(67,97,238,.3); transition: all 0.3s ease; }
-        .show-oee-btn:hover, .export-excel-btn:hover { background: #3651d4; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(67,97,238,.4); }
+        .show-oee-btn, .export-excel-btn, .clear-data-btn { background: var(--primary); color: white; border: none; border-radius: 1rem; padding: 1rem 2rem; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: .75rem; box-shadow: 0 6px 20px rgba(67,97,238,.3); transition: all 0.3s ease; cursor: pointer; }
+        .show-oee-btn:hover, .export-excel-btn:hover, .clear-data-btn:hover { background: #3651d4; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(67,97,238,.4); }
         .export-excel-btn { background: #16a34a !important; }
         .export-excel-btn:hover { background: #138843 !important; }
+        .clear-data-btn { background: #dc3545 !important; }
+        .clear-data-btn:hover { background: #c82333 !important; }
         .oee-charts { display: none; margin-top: 3rem; padding: 2rem; background: white; border-radius: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
         .chart-container { height: 320px; margin-bottom: 2rem; position: relative; }
         .chart-title { text-align: center; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; gap: .5rem; }
@@ -76,7 +78,7 @@
         .metric-oee { font-size: 1.7rem !important; color: var(--success) !important; }
         .quality-ok { color: var(--success); font-weight: bold; font-size: .8rem; }
         .nav-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding: 1rem 0; border-top: 1px solid var(--border); }
-        .nav-btn { background: var(--primary); color: white; border: none; border-radius: .75rem; padding: .75rem 1.5rem; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: .5rem; transition: all 0.3s ease; min-width: 130px; justify-content: center; }
+        .nav-btn { background: var(--primary); color: white; border: none; border-radius: .75rem; padding: .75rem 1.5rem; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: .5rem; transition: all 0.3s ease; min-width: 130px; justify-content: center; cursor: pointer; }
         .nav-btn:hover { background: #3651d4; transform: translateY(-2px); }
         .nav-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
         .machine-counter { font-weight: 600; color: var(--primary); font-size: 1.1rem; }
@@ -94,7 +96,8 @@
         .factory-oee-card { background: linear-gradient(135deg, #4361ee, #3651d4); color: white; border: none; }
         .factory-oee-card h4, .factory-oee-card .count { color: white; }
         .factory-oee-card .avg-value { color: #a0f1ea; }
-        @media (max-width: 768px) { .action-buttons { flex-direction: column; } .show-oee-btn, .export-excel-btn { width: 100%; max-width: 300px; } }
+        .data-saved-alert { position: fixed; top: 1rem; right: 1rem; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: .75rem 1.5rem; border-radius: .75rem; font-weight: 600; z-index: 2000; opacity: 0; transition: opacity 0.3s ease; }
+        @media (max-width: 768px) { .action-buttons { flex-direction: column; } .show-oee-btn, .export-excel-btn, .clear-data-btn { width: 100%; max-width: 300px; } }
     </style>
 </head>
 <body>
@@ -116,7 +119,7 @@
     <div id="home" class="page active container py-4">
         <div class="hero">
             <h1>OEE Dashboard</h1>
-            <p>Select a machine section to enter data or view OEE performance.</p>
+            <p>Track <strong>OEE = Availability × Performance × Quality</strong></p>
         </div>
 
         <!-- A, P, Q + OEE Averages -->
@@ -199,6 +202,9 @@
             <button class="export-excel-btn" onclick="exportToExcel()">
                 <i class="fas fa-file-excel"></i> Export to Excel
             </button>
+            <button class="clear-data-btn" onclick="clearAllData()">
+                <i class="fas fa-trash-alt"></i> Clear All Data
+            </button>
         </div>
 
         <!-- Charts -->
@@ -232,6 +238,7 @@
     </div>
 
     <div id="scrollTop" class="scroll-to-top"><i class="fas fa-arrow-up"></i></div>
+    <div id="data-saved-alert" class="data-saved-alert">Data saved!</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -244,12 +251,59 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Data
-        const machineData = {
+        // LOCAL STORAGE
+        const STORAGE_KEY = 'jpi_oee_data_v1';
+        let machineData = {
             im: Array(33).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 })),
             bm: Array(17).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 })),
             iml: Array(10).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 }))
         };
+
+        // Load Data
+        function loadData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    ['im', 'bm', 'iml'].forEach(sec => {
+                        if (parsed[sec] && Array.isArray(parsed[sec])) {
+                            machineData[sec] = parsed[sec].map(m => ({
+                                oee: m.oee || 0, a: m.a || 0, p: m.p || 0, q: m.q || 100,
+                                name: m.name || '', hasData: m.hasData || false,
+                                plannedQty: m.plannedQty || 0, targetPerHour: m.targetPerHour || 0,
+                                cavityCount: m.cavityCount || 1, breakdownTime: m.breakdownTime || 0,
+                                mouldChangeTime: m.mouldChangeTime || 0, lackOperatorTime: m.lackOperatorTime || 0,
+                                itemClearTime: m.itemClearTime || 0, machineStartedTime: m.machineStartedTime || 0,
+                                othersTime: m.othersTime || 0, damageQty: m.damageQty || 0
+                            }));
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to load data:", e);
+            }
+        }
+
+        // Save Data
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(machineData));
+                const alert = document.getElementById('data-saved-alert');
+                alert.style.opacity = '1';
+                setTimeout(() => alert.style.opacity = '0', 1500);
+            } catch (e) {
+                console.error("Failed to save data:", e);
+            }
+        }
+
+        // Clear All Data
+        function clearAllData() {
+            if (confirm('Are you sure you want to delete ALL saved data? This cannot be undone.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
         let currentSection = null, currentIndex = 0, totalMachines = 0, charts = {}, chartsVisible = false;
 
         // Update Averages
@@ -271,11 +325,12 @@
                 const avgP = count > 0 ? sumP / count : 0;
                 const avgQ = count > 0 ? sumQ / count : 100;
 
-                document.getElementById(`oee-${sec}`).textContent = avgOee.toFixed(2) + '%';
-                document.getElementById(`a-${sec}`).textContent = avgA.toFixed(2) + '%';
-                document.getElementById(`p-${sec}`).textContent = avgP.toFixed(2) + '%';
-                document.getElementById(`q-${sec}`).textContent = avgQ.toFixed(2) + '%';
-                document.getElementById(`count-${sec}`).textContent = `${count} / ${sections[sec]} machines`;
+                const el = (id) => document.getElementById(id);
+                el(`oee-${sec}`).textContent = avgOee.toFixed(2) + '%';
+                el(`a-${sec}`).textContent = avgA.toFixed(2) + '%';
+                el(`p-${sec}`).textContent = avgP.toFixed(2) + '%';
+                el(`q-${sec}`).textContent = avgQ.toFixed(2) + '%';
+                el(`count-${sec}`).textContent = `${count} / ${sections[sec]} machines`;
 
                 if (count > 0) { totalOee += avgOee; validSections++; }
             });
@@ -322,7 +377,7 @@
             XLSX.writeFile(wb, `JPI_OEE_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
-        // Page
+        // Page Navigation
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -395,7 +450,7 @@
             card.innerHTML = `
                 <div class="machine-header">
                     <h3><i class="fas fa-microchip"></i> ${type} ${machineNum}</h3>
-                    <input type="text" placeholder="Enter name" value="${saved.name}">
+                    <input type="text" placeholder="Enter name" value="${saved.name}" class="form-control name-input">
                 </div>
                 <div class="section-title"><i class="fas fa-clock"></i>1. Available Time</div>
                 <div class="row g-3">
@@ -435,9 +490,9 @@
                     <div class="metric-card"><div class="metric-label">OEE</div><div class="metric-value metric-oee" id="oee">0.00%</div></div>
                 </div>
                 <div class="nav-controls">
-                    <button class="nav-btn" id="prev-btn" onclick="prevMachine()"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <button class="nav-btn" id="prev-btn">Previous</button>
                     <div class="machine-counter">Machine <strong>${machineNum}</strong> of <strong>${totalMachines}</strong></div>
-                    <button class="nav-btn" id="next-btn" onclick="nextMachine()">Next <i class="fas fa-chevron-right"></i></button>
+                    <button class="nav-btn" id="next-btn">Next</button>
                 </div>
             `;
             container.appendChild(card);
@@ -447,12 +502,30 @@
             card.scrollIntoView({ behavior: 'smooth' });
 
             const inputs = card.querySelectorAll('input');
-            const nameInput = card.querySelector('input[placeholder="Enter name"]');
+            const nameInput = card.querySelector('.name-input');
             const arEl = card.querySelector('#ar');
             const prEl = card.querySelector('#pr');
             const qrEl = card.querySelector('#qr');
             const oeeEl = card.querySelector('#oee');
             const qualityIcon = card.querySelector('.quality-ok');
+
+            // ENTER KEY → JUMP TO NEXT FIELD
+            inputs.forEach((input, i) => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const next = inputs[i + 1];
+                        if (next) {
+                            next.focus();
+                            next.select && next.select();
+                        } else {
+                            if (currentIndex < totalMachines - 1) {
+                                nextMachine();
+                            }
+                        }
+                    }
+                });
+            });
 
             function updateMetrics() {
                 const get = (cls, def = 0) => parseFloat(card.querySelector(cls).value) || def;
@@ -499,12 +572,17 @@
                     lackOperatorTime: lackOp, itemClearTime: clear,
                     machineStartedTime: started, othersTime: others, damageQty: damage
                 };
+                saveData();
                 updateAverages();
                 if (chartsVisible) updateCharts();
             }
 
             inputs.forEach(i => i.addEventListener('input', updateMetrics));
             nameInput.addEventListener('input', updateMetrics);
+
+            card.querySelector('#prev-btn').onclick = () => { if (currentIndex > 0) loadMachine(currentIndex - 1); };
+            card.querySelector('#next-btn').onclick = () => { if (currentIndex < totalMachines - 1) loadMachine(currentIndex + 1); };
+
             updateMetrics();
         }
 
@@ -559,7 +637,8 @@
         });
         scrollTop.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Init
+        // INIT
+        loadData();
         updateAverages();
     </script>
 </body>
