@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JPI – OEE Dashboard</title>
+    <title>Jayasinghe Plastic Industries OEE Tracking</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -28,7 +28,7 @@
         .navbar-brand { font-weight: 700; color: var(--primary) !important; }
         .hero { background: linear-gradient(135deg, #eef2ff, #d0e0ff); padding: 4rem 2rem; border-radius: 1.5rem; margin: 2rem 0; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,.08); }
         .hero h1 { font-weight: 800; color: var(--primary); margin-bottom: 1rem; }
-        .hero p { font-size: 1.1rem; color: #555; max-width: 700px; margin: 0 auto 2rem; font-weight: 500; }
+        .hero .oee-intro { font-size: 1rem; color: #555; max-width: 700px; margin: 0 auto 2rem; font-weight: 400; }
         .login-section { background: white; border-radius: 1rem; padding: 2rem; margin: 1rem auto; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,.05); display: none; }
         .login-section h4 { color: var(--primary); margin-bottom: 1rem; }
         .login-section input { margin-bottom: 1rem; }
@@ -37,9 +37,9 @@
         .logout-btn { background: var(--danger); color: white; border: none; padding: .5rem 1rem; border-radius: .5rem; font-size: .9rem; margin-left: 1rem; }
         .auth-status { text-align: right; padding: 1rem; background: #f8f9ff; border-radius: .75rem; margin: 1rem 0; }
         .read-only { background: #fff3cd !important; color: #856404 !important; border-color: #ffeaa7 !important; }
-        .shift-selector { text-align: center; margin: 2rem 0; }
-        .shift-selector label { font-weight: 600; margin-right: 1rem; }
-        .shift-selector select { display: inline-block; width: auto; max-width: 200px; }
+        .shift-selector { text-align: center; margin: 2rem 0; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .shift-selector label { font-weight: 600; margin-right: .5rem; }
+        .shift-selector select, .shift-selector input[type="date"] { display: inline-block; width: auto; max-width: 200px; }
         .section-tabs { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin: 3rem 0; }
         .tab-card { background: white; border: 1px solid var(--border); border-radius: 1rem; padding: 2rem; width: 280px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,.05); transition: all 0.3s ease; cursor: pointer; }
         .tab-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,.12); border-color: var(--primary); }
@@ -144,7 +144,7 @@
     <div id="home" class="page active container py-4">
         <div class="hero">
             <h1>OEE Dashboard</h1>
-            <p>Track <strong>OEE = Availability × Performance × Quality</strong></p>
+            <p class="oee-intro">Overall Equipment Effectiveness (OEE) measures manufacturing productivity by combining Availability, Performance, and Quality. Use this dashboard to monitor and optimize machine performance across shifts and sections at Jayasinghe Plastic Industries.</p>
             <div id="login-section" class="login-section">
                 <h4><i class="fas fa-sign-in-alt"></i> Login to Edit Data</h4>
                 <input type="email" id="login-email" class="form-control" placeholder="Email" />
@@ -155,11 +155,17 @@
         </div>
         <div id="read-only-msg" class="read-only-msg" style="display: none;">Viewing in read-only mode. <a href="#" onclick="showLogin()">Login to edit</a>.</div>
         <div class="shift-selector">
-            <label for="shiftSelector">Select Shift for Entry:</label>
-            <select id="shiftSelector" class="form-select">
-                <option value="day">Day Shift</option>
-                <option value="night">Night Shift</option>
-            </select>
+            <div>
+                <label for="dateSelector">Select Date:</label>
+                <input type="date" id="dateSelector" class="form-control">
+            </div>
+            <div>
+                <label for="shiftSelector">Select Shift:</label>
+                <select id="shiftSelector" class="form-select">
+                    <option value="day">Day Shift</option>
+                    <option value="night">Night Shift</option>
+                </select>
+            </div>
         </div>
         <!-- A, P, Q + OEE Averages -->
         <div class="summary-cards">
@@ -325,7 +331,7 @@
     <div id="data-saved-alert" class="data-saved-alert">Data saved!</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Your Firebase Config (unchanged)
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyABor7ZDaPfwi2dgqmoU5XxhquU7_0Tqxg",
             authDomain: "jpi-oee-dashboard.firebaseapp.com",
@@ -335,11 +341,10 @@
             messagingSenderId: "1097687079271",
             appId: "1:1097687079271:web:d61efb945ac44a076eb7c2"
         };
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
-        const WRITER_UID = '6xlNwEqhKOPYeRRvDsZ1alqwsqw2'; // Your specific UID
+        const WRITER_UID = '6xlNwEqhKOPYeRRvDsZ1alqwsqw2';
 
         // Auth Listener
         auth.onAuthStateChanged((user) => {
@@ -384,12 +389,9 @@
             return user && user.uid === WRITER_UID;
         }
 
-        // Update UI based on auth (e.g., disable inputs if not writer)
+        // Update UI based on auth
         function updateUIForAuth() {
-            // In machine entry, inputs are read-only if not writer (handled in loadMachine)
-            if (!isWriter()) {
-                // Add read-only class to action buttons (already done via classes)
-            }
+            // Inputs are made read-only in loadMachine if not writer
         }
 
         // Login Function
@@ -426,7 +428,7 @@
             document.getElementById('login-email').focus();
         }
 
-        // Clock (unchanged)
+        // Clock
         function updateClock() {
             const now = new Date();
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Colombo' };
@@ -435,7 +437,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Data Structure (unchanged)
+        // Data Structure
         let machineData = {
             day: {
                 im: Array(33).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 })),
@@ -449,14 +451,35 @@
             }
         };
 
-        // Firebase Database Reference (unchanged)
-        const dataRef = db.ref('jpi_oee_data_v2');
+        let currentDate = new Date().toISOString().slice(0, 10); // Default to today (YYYY-MM-DD)
+        const dateSelector = document.getElementById('dateSelector');
 
-        // Load Data from Firebase (unchanged - public read)
+        // Set default date to today
+        dateSelector.value = currentDate;
+
+        // Firebase Database Reference
+        function getDataRef() {
+            return db.ref(`jpi_oee_data_v2/${currentDate}`);
+        }
+
+        // Load Data from Firebase
         function loadData() {
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
-            dataRef.once('value').then((snapshot) => {
+            // Reset machineData to default
+            machineData = {
+                day: {
+                    im: Array(33).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 })),
+                    bm: Array(17).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 })),
+                    iml: Array(10).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 }))
+                },
+                night: {
+                    im: Array(33).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 })),
+                    bm: Array(17).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 })),
+                    iml: Array(10).fill().map(() => ({ oee: 0, a: 0, p: 0, q: 100, name: '', hasData: false, plannedQty: 0, targetPerHour: 0, cavityCount: 1, breakdownTime: 0, mouldChangeTime: 0, lackOperatorTime: 0, itemClearTime: 0, machineStartedTime: 0, othersTime: 0, damageQty: 0 }))
+                }
+            };
+            getDataRef().once('value').then((snapshot) => {
                 const saved = snapshot.val();
                 if (saved) {
                     ['day', 'night'].forEach(shift => {
@@ -479,6 +502,7 @@
                 }
                 loading.style.display = 'none';
                 updateAverages();
+                if (chartsVisible) updateCharts();
             }).catch((error) => {
                 console.error("Failed to load data:", error);
                 loading.style.display = 'none';
@@ -486,13 +510,13 @@
             });
         }
 
-        // Save Data to Firebase (updated with auth check)
+        // Save Data to Firebase
         function saveData() {
             if (!isWriter()) {
                 showLogin();
                 return;
             }
-            dataRef.set(machineData).then(() => {
+            getDataRef().set(machineData).then(() => {
                 const alert = document.getElementById('data-saved-alert');
                 alert.style.opacity = '1';
                 setTimeout(() => alert.style.opacity = '0', 1500);
@@ -502,15 +526,15 @@
             });
         }
 
-        // Clear All Data (updated with auth check)
+        // Clear All Data for Selected Date
         function clearAllData() {
             if (!isWriter()) {
                 showLogin();
                 return;
             }
-            if (confirm('Are you sure you want to delete ALL saved data? This cannot be undone.')) {
-                dataRef.remove().then(() => {
-                    location.reload();
+            if (confirm(`Are you sure you want to delete ALL data for ${currentDate}? This cannot be undone.`)) {
+                getDataRef().remove().then(() => {
+                    loadData();
                 }).catch((error) => {
                     console.error("Failed to clear data:", error);
                     alert("Failed to clear data from Firebase.");
@@ -520,7 +544,7 @@
 
         let currentSection = null, currentShift = 'day', currentIndex = 0, totalMachines = 0, charts = {}, chartsVisible = false;
 
-        // Update Averages (unchanged)
+        // Update Averages
         function updateAverages() {
             const sections = { im: 33, bm: 17, iml: 10 };
             let dayTotalOee = 0, dayValidSections = 0;
@@ -592,7 +616,7 @@
             }
         }
 
-        // Export to Excel (unchanged, works for all as it's local)
+        // Export to Excel
         function exportToExcel() {
             if (!isWriter() && confirm('Export is read-only. Continue?')) {
                 // Proceed
@@ -601,7 +625,7 @@
             }
             const wb = XLSX.utils.book_new();
             const summaryData = [
-                ["JPI OEE Export", ""], ["Generated", new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })], [""],
+                ["JPI OEE Export", ""], ["Date", currentDate], ["Generated", new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })], [""],
                 ["Section", "OEE Avg", "A Avg", "P Avg", "Q Avg", "Machines"]
             ];
             ['day', 'night'].forEach(shift => {
@@ -639,10 +663,10 @@
                     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), `${shift.toUpperCase()} ${map[sec]}`);
                 });
             });
-            XLSX.writeFile(wb, `JPI_OEE_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.writeFile(wb, `JPI_OEE_${currentDate}.xlsx`);
         }
 
-        // Page Navigation (updated to hide login on home)
+        // Page Navigation
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -660,7 +684,7 @@
             }
         }
 
-        // Charts (unchanged)
+        // Charts
         function toggleOEECharts() {
             const div = document.getElementById('oee-charts');
             const btn = document.querySelector('.show-oee-btn');
@@ -698,7 +722,7 @@
             });
         }
 
-        // Machine Entry (updated: inputs read-only if not writer)
+        // Machine Entry
         function initSection(type, count, label, icon) {
             if (!isWriter()) {
                 alert('Login required to enter/edit data.');
@@ -707,12 +731,12 @@
             }
             currentShift = document.getElementById('shiftSelector').value;
             currentSection = type; totalMachines = count;
-            document.getElementById('section-title').innerHTML = `<i class="${icon} me-2"></i>${label} (${currentShift.toUpperCase()}) – Machine <span id="current-num">1</span> of ${count}`;
+            document.getElementById('section-title').innerHTML = `<i class="${icon} me-2"></i>${label} (${currentShift.toUpperCase()}, ${currentDate}) – Machine <span id="current-num">1</span> of ${count}`;
             showPage('section-page');
             loadMachine(0);
         }
         function loadMachine(index) {
-            if (!isWriter()) return; // Safety
+            if (!isWriter()) return;
             currentIndex = index;
             const container = document.getElementById('machine-container');
             container.innerHTML = '';
@@ -766,7 +790,7 @@
                 <div class="nav-controls">
                     <button class="nav-btn" id="prev-btn">Previous</button>
                     <div class="machine-counter">Machine <strong>${machineNum}</strong> of <strong>${totalMachines}</strong></div>
-                    <button class="nav-btn" id="next-btn">Next</button>
+                    <button class="nav-btn" id="next-btn">Previous</button>
                 </div>
             `;
             container.appendChild(card);
@@ -782,13 +806,13 @@
             const oeeEl = card.querySelector('#oee');
             const qualityIcon = card.querySelector('.quality-ok');
 
-            // If not writer, make inputs read-only (but since initSection checks, this is backup)
+            // If not writer, make inputs read-only
             if (!isWriter()) {
                 inputs.forEach(input => input.disabled = true);
                 nameInput.disabled = true;
             }
 
-            // ENTER KEY → JUMP TO NEXT FIELD (only if writer)
+            // ENTER KEY → JUMP TO NEXT FIELD
             if (isWriter()) {
                 inputs.forEach((input, i) => {
                     input.addEventListener('keydown', (e) => {
@@ -869,7 +893,7 @@
         function prevMachine() { if (currentIndex > 0) loadMachine(currentIndex - 1); }
         function nextMachine() { if (currentIndex < totalMachines - 1) loadMachine(currentIndex + 1); }
 
-        // Search (unchanged)
+        // Search
         const searchInput = document.querySelector('.search-input');
         const searchResults = document.getElementById('search-results');
         searchInput.addEventListener('input', () => {
@@ -896,7 +920,7 @@
             results.forEach(r => {
                 const item = document.createElement('div');
                 item.className = 'search-result-item';
-                item.innerHTML = `<div><div class="search-result-name">${r.name}</div><small class="text-muted">${r.sec.toUpperCase()} - ${r.shift.toUpperCase()}</small></div><div class="search-result-oee">${r.oee.toFixed(1)}%</div>`;
+                item.innerHTML = `<div><div class="search-result-name">${r.name}</div><small class="text-muted">${r.sec.toUpperCase()} - ${r.shift.toUpperCase()} (${currentDate})</small></div><div class="search-result-oee">${r.oee.toFixed(1)}%</div>`;
                 item.onclick = () => {
                     if (!isWriter()) {
                         alert('Login required to view/edit machine details.');
@@ -917,14 +941,24 @@
             if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.style.display = 'none';
         });
 
-        // Scroll to top (unchanged)
+        // Date Selector Event
+        dateSelector.addEventListener('change', () => {
+            currentDate = dateSelector.value;
+            if (!currentDate) {
+                currentDate = new Date().toISOString().slice(0, 10);
+                dateSelector.value = currentDate;
+            }
+            loadData();
+        });
+
+        // Scroll to top
         const scrollTop = document.getElementById('scrollTop');
         window.addEventListener('scroll', () => {
             scrollTop.style.display = window.scrollY > 500 ? 'flex' : 'none';
         });
         scrollTop.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // INIT - Load from Firebase on start (unchanged)
+        // INIT - Load from Firebase on start
         loadData();
     </script>
 </body>
