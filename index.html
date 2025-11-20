@@ -123,7 +123,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="#" onclick="showPage('home'); return false;">
-                <i class="fas fa-cogs me-2"></i>JPI OEE
+                <i class="fas fa-cogs me-2"></i>Overall Equipment Effectivenss
             </a>
             <span class="navbar-text ms-auto">
                 <i class="fas fa-calendar-alt me-1"></i>
@@ -143,8 +143,9 @@
     <!-- Home Page -->
     <div id="home" class="page active container py-4">
         <div class="hero">
-            <h1>OEE Dashboard</h1>
-            <p>Track <strong>OEE = Availability × Performance × Quality</strong></p>
+            <h1>Jayasinghe Plastic Industries OEE Dashboard</h1>
+            <p><strong>Overall Equipment Effectiveness is a simple measure of how efficiently a machine is running, based on its Availability, Performance, and Quality. It shows how much of the equipments full potential is actually used and helps identify areas to improve productivity.
+
             <div id="login-section" class="login-section">
                 <h4><i class="fas fa-sign-in-alt"></i> Login to Edit Data</h4>
                 <input type="email" id="login-email" class="form-control" placeholder="Email" />
@@ -153,6 +154,14 @@
                 <p class="text-muted small mt-2">Use your Firebase account (email/password). Only authorized users can save.</p>
             </div>
         </div>
+<div class="text-center my-4">
+    <div class="d-inline-flex align-items-center bg-white rounded-pill shadow-sm border px-3 py-2" style="border: 2px solid #4361ee;">
+        <i class="fas fa-calendar-alt text-primary me-2"></i>
+        <input type="date" id="datePicker" class="border-0" style="outline: none; width: 140px; font-weight: 600; color: #4361ee; background: transparent;">
+        <span id="selectedDateText" class="ms-2 text-primary fw-bold"></span>
+    </div>
+    <div class="text-muted small mt-1">Data for selected date</div>
+</div>
         <div id="read-only-msg" class="read-only-msg" style="display: none;">Viewing in read-only mode. <a href="#" onclick="showLogin()">Login to edit</a>.</div>
         <div class="shift-selector">
             <label for="shiftSelector">Select Shift for Entry:</label>
